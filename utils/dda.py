@@ -57,6 +57,6 @@ class Ray():                # tile_map["layer"] => {"0;0" : "..."}
                 self.rayLenght1D[1] += self.rayUnitSetpsize[1]
             #pygame.draw.circle(self.game.display, (255, 100, 100), [(self.mapCheck[0] + self.raydir[0] * self.dis) * self.tile_size, (self.mapCheck[1] + self.raydir[1] * self.dis) * self.tile_size], 4)
             #pygame.draw.circle(self.game.display, (255, 0, 0), [self.raystart[0] * self.tile_size, self.raystart[1] * self.tile_size], 4)
-            if self.mapCheck[0] >= 0 and self.mapCheck[0] < self.game.w and self.mapCheck[1] >= 0 and self.mapCheck[1] < self.game.h:
-                if f"{int(self.mapCheck[1])};{int(self.mapCheck[0])}" in self.tile_map["tiles"]:
-                    self.tile_found = True
+            #if self.mapCheck[0] >= 0 and self.mapCheck[0] < self.game.w and self.mapCheck[1] >= 0 and self.mapCheck[1] < self.game.h:
+            if f"{int(self.mapCheck[0])};{int(self.mapCheck[1])}" in self.tile_map:
+                self.tile_found = True

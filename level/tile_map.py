@@ -15,7 +15,7 @@ class TileMap:
             "layer1" : {
                 "z" : 0,
                 "tiles":
-                    {f"{i};10" : {"tile" : "grass", "variant" : 0, "pos" : (i, 10)} for i in range(15)}
+                    {f"{i};10" : {"tile" : "grass", "variant" : 0, "pos" : (i, 10)} for i in range(30)} | {"0;9" : {"tile" : "grass", "variant" : 0, "pos" : (0, 9)}}
             }
         }
 

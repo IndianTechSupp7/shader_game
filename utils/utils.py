@@ -9,6 +9,31 @@ def load_json(file):
 def get_dis(a, b):
     return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
 
+def lerp(a, b, t):
+    return a + (b-a)*t
+
+
+def interpolate(x, y, step):
+    """
+    Gradually interpolates x towards y in steps.
+
+    Parameters:
+        x (float): The starting number.
+        y (float): The target number.
+        step (float): The step size for interpolation (positive).
+
+    Returns:
+        generator: A generator that yields the intermediate values of x until it reaches y.
+    """
+    if step <= 0:
+        raise ValueError("Step size must be a positive number.")
+
+    while abs(x - y) > step:
+        x += step if y > x else -step
+        yield x
+    yield y  # Ensure the target value is yielded at the end.
+
+
 def get_dir(a, b):
     m = get_dis(a, b)
     return [(b[0] - a[0]) / m, (b[1] - a[1]) / m]
