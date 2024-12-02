@@ -33,6 +33,7 @@ class Game(Window):
             self.tile_map.render(self.display, offset)
             self.player.render(self.display, offset)
 
+
             #self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
 
             super().run()
