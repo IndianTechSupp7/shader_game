@@ -28,7 +28,7 @@ class Game(Window):
 
             keys = pygame.key.get_pressed()
             self.player.update([keys[pygame.K_d] - keys[pygame.K_a], 0],
-                               layers=["layer1"])
+                               layers=["layer1"], dt=self.dt)
 
             self.tile_map.render(self.display, offset)
             self.player.render(self.display, offset)

@@ -12,6 +12,8 @@ class Window:
         self.screen_shader = DefaultScreenShader(self.display)
 
         self.clock = pygame.time.Clock()
+        self.dt = 0
+
 
         self.mouse = {
             "press" : [False, False, False],
@@ -52,7 +54,7 @@ class Window:
         self.mouse["pos"] = pygame.mouse.get_pos()
 
     def run(self):
-        self.clock.tick(120)
+        self.dt = self.clock.tick(120)/1000
         self.screen_shader.render()
         pygame.display.flip()
 

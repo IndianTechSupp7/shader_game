@@ -9,6 +9,7 @@ class Entity:
         self.size = size
 
         self.vel = [0., 0.]
+        self.air_time = 0
 
     def rect(self):
         return pygame.Rect(*self.pos, *self.size)
@@ -46,4 +47,9 @@ class Entity:
 
         if self.collison_types["bottom"] or self.collison_types["top"]:
             self.vel[1] = 0
+
+        if not self.collison_types["bottom"]:
+            self.air_time += 1
+        else:
+            self.air_time = 0
 
