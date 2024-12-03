@@ -34,6 +34,7 @@ class Player(Entity, Sprite):
 
         self.jump_threshold = Timer(0.2)
         self._dx = 0
+        self.speed = 1.6
 
     def jump(self):
         if self.collison_types["bottom"]:
@@ -47,13 +48,16 @@ class Player(Entity, Sprite):
 
     
     def update(self, movement = [0, 0], layers = [], dt=1):
-        self._dx = next(interpolate(self._dx, movement[0], 0.2))
+        self._dx = next(interpolate(self._dx, movement[0], 0.06))
+        print(self._dx)
         if self._dx > 0:
-            a = bezier(0.758,  0.0,  0.098,  0.084, self._dx)[1]
-            print(a ,self._dx)
+            a = bezier(0.244,  0.327,  0.4,  1.038, self._dx)[1]
+            #print(a ,self._dx)
             super().update([a, movement[1]], layers)
-        elif self. _dx < 0:
-            super().update([-bezier(0.758,  0.0,  0.098,  0.084, abs(self._dx))[1], movement[1]], layers)
+        elif self._dx < 0:
+            a = bezier(0.244, 0.327, 0.4, 1.038, abs(self._dx))[1]
+            # print(a ,self._dx)
+            super().update([-a, movement[1]], layers)
         else:
             super().update(movement, layers)
         self.platform_points["bottom_left"] = self.platform_rays["bottom_left"].update(list(self.rect().center), 140)

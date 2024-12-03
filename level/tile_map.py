@@ -1,6 +1,7 @@
 import pygame
 import math
 from utils.window import Window
+import random
 
 OFFSETS = [(-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
 
@@ -19,6 +20,7 @@ class TileMap:
             }
         }
 
+        self.colors = {c : (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for c in self.tile_map["layer1"]["tiles"]}
 
         self.tile_size = tile_size
 
@@ -45,7 +47,7 @@ class TileMap:
                 # test purposes
                 if coord in self.tile_map[layer]["tiles"]:
                     pos = self.tile_map[layer]["tiles"][coord]["pos"]
-                    pygame.draw.rect(surf, (255, 255, 255), ((pos[0] * self.tile_size) - offset[0], (pos[1] * self.tile_size) - offset[1], self.tile_size, self.tile_size))
+                    pygame.draw.rect(surf, self.colors[coord], ((pos[0] * self.tile_size) - offset[0], (pos[1] * self.tile_size) - offset[1], self.tile_size, self.tile_size))
 
     def render(self, surf, offset = (0, 0)):
         for layer in sorted(self.tile_map, key=lambda x: self.tile_map[x]["z"]):
