@@ -2,6 +2,7 @@ import pygame
 from utils.entity import Entity
 from utils.shader import Shader, Texture, ConstUniforms
 from utils.animation import Animation
+import time
 
 
 class Sprite:
@@ -24,6 +25,7 @@ class Sprite:
         self.const_uniforms = ConstUniforms(
             time=0,
         ).update_shaders(self.shaders)
+        self._start_time = time.time()
 
 
     def update_renderer(self, dt=1):

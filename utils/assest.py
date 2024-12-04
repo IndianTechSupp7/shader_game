@@ -9,7 +9,9 @@ class Assets:
     def __init__(self):
         self.images = self.generate_image_tree(MAIN_ROOT + "/images", key=self._image_filter)
         self._shader_filter = lambda path: os.path.join(MAIN_ROOT + "/shaders", path)
+        self.maps_filter = lambda path: os.path.join(MAIN_ROOT + "/maps", path)
         self.shaders = self.generate_image_tree(MAIN_ROOT + "/shaders", key=self._shader_filter)
+        self.maps = self.generate_image_tree(MAIN_ROOT + "/maps", key=self.maps_filter)
 
 
 
@@ -35,4 +37,4 @@ class Assets:
                 path_parts = relative_path.replace(os.sep, '-')
                 #image = pygame.image.load(os.path.join(bpath, relative_path)).convert_alpha()
                 tree.append([path_parts, key(relative_path)])
-        return generate_dict_tree(tree, sep="-")
+        return  generate_dict_tree(tree, sep="-") if tree else {}

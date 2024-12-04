@@ -6,6 +6,10 @@ def load_json(file):
         data = json.load(file)
     return data
 
+def save_json(data, file):
+    with open(file, "w") as file:
+        json.dump(data, file)
+
 def get_dis(a, b):
     return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
 
