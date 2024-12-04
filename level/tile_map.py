@@ -2,6 +2,7 @@ import pygame
 import math
 from utils.window import Window
 import random
+from utils import Sprite, Assets, Shader
 
 OFFSETS = [(-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
 
@@ -12,6 +13,8 @@ class TileMap:
         self.game = game
         self.path = self.BASE_PATH + path + ".json"
         #self.tile_map = load_json(self.path) # {layer1 : {z = 0, tiles : {0;0 : {tile : grass, variant : 0, pos : (0, 0)}}}}
+
+
         self.tile_map = {
             "layer1" : {
                 "z" : 0,
@@ -23,6 +26,11 @@ class TileMap:
         self.colors = {c : (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for c in self.tile_map["layer1"]["tiles"]}
 
         self.tile_size = tile_size
+
+        self.sprite = Sprite(self,
+                             shaders=[Shader(frag_path=Assets.get_shader("player/splash.glsl"))],
+                             size=(self.tile_size, self.tile_size)
+                             )
 
 
     def get_collide_rects(self, pos, size, layer):
@@ -40,15 +48,17 @@ class TileMap:
         return rects
 
     def _render_layer(self, layer, surf, offset = (0, 0)):
-
+        self.sprite.update_renderer()
         for x in range(math.ceil(self.game.size[0] / self.tile_size)):
             for y in range(math.ceil(self.game.size[1] / self.tile_size)):
                 coord = f"{x};{y}"
                 # test purposes
                 if coord in self.tile_map[layer]["tiles"]:
                     pos = self.tile_map[layer]["tiles"][coord]["pos"]
-                    pygame.draw.rect(surf, self.colors[coord], ((pos[0] * self.tile_size) - offset[0], (pos[1] * self.tile_size) - offset[1], self.tile_size, self.tile_size))
-
+                    self.sprite.shaders[0].send("offset", [(pos[0] * self.tile_size)/self.game.w, (pos[1] * self.tile_size)/self.game.h])
+                    #print((pos[0] * self.tile_size)/self.game.w, (pos[1] * self.tile_size)/self.game.h)
+                    #pygame.draw.rect(surf, self.colors[coord], ((pos[0] * self.tile_size) - offset[0], (pos[1] * self.tile_size) - offset[1], self.tile_size, self.tile_size))
+                    surf.blit(self.sprite.render(update=False), ((pos[0] * self.tile_size) - offset[0], (pos[1] * self.tile_size) - offset[1], self.tile_size, self.tile_size))
     def render(self, surf, offset = (0, 0)):
         for layer in sorted(self.tile_map, key=lambda x: self.tile_map[x]["z"]):
             self._render_layer(layer, surf, offset)

@@ -10,9 +10,13 @@ class Sprite:
         self.kwargs = kwargs
         self.animation = Animation(kwargs.get("animation")) if kwargs.get("animation") else None
         self.shaders = kwargs.get("shaders") or [] # [Shader(frag, vert)]
+        self.image = kwargs.get("image")
+        self.size = kwargs.get("size") or self.parent.size
 
-        self.surf = pygame.Surface(self.parent.size, pygame.SRCALPHA)
+        self.surf = pygame.Surface(self.size, pygame.SRCALPHA)
         self.surf.fill((255, 0, 0))
+        if self.image:
+            pygame.transform.scale(self.image, self.surf.size, self.surf)
 
         for shader in self.shaders:
             shader.construct(self.surf)
@@ -22,14 +26,16 @@ class Sprite:
         ).update_shaders(self.shaders)
 
 
-
-
-
-    def render(self):
+    def update_renderer(self, dt=1):
         self.const_uniforms.time += 0.01
-
-
         self.const_uniforms.update_shaders(self.shaders)
+
+
+    def render(self, update=True):
+        if update:
+            self.update_renderer()
+
+
         if self.animation:
             self.surf = self.animation.render()
 

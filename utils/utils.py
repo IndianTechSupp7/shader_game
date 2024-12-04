@@ -51,5 +51,37 @@ def bezier(a: float, b: float, c: float, d: float, t: float):
     y = (1 - t)**3 * 0 + t*b*(3*(1-t)**2) + d*(3*(1-t)*t**2) + 1*t**3
     return x, y
 
+def merge_dicts(dict1, dict2):
+    for key, value in dict2.items():
+        if key in dict1 and isinstance(dict1[key], dict) and isinstance(value, dict):
+            # If the key exists in both and both values are dictionaries, merge them
+            merge_dicts(dict1[key], value)
+        else:
+            # Otherwise, overwrite or add the key
+            dict1[key] = value
+    return dict1
+
+
+def generate_dict_branch(base_path, value, sep="."):
+    path = base_path.split(sep)
+    tree = {path[-1] : value}
+    for i in path[::-1][1:]:
+        tree = {i : tree}
+    return tree
+
+def generate_dict_tree(bpaths, sep="."):
+    paths = [(path.split(sep), val) for path, val in bpaths]
+    tree = {paths[0][0][0] : {}}
+    for path, val in paths:
+        a = generate_dict_branch(sep.join(path), val, sep=sep)
+        tree = merge_dicts(tree, a)
+
+    return tree
+
+if __name__ == '__main__':
+    tree = generate_dict_tree([["entities.player.idle", "image0"],
+                        ["entities.player.run.fast", 10],
+                        ["entities.enemy.idle", 20],])
+
 
 

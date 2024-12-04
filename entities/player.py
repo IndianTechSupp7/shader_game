@@ -7,13 +7,19 @@ from utils.sprite import Sprite
 from utils.shader import Shader, DEFAULT_VERTEX_SHADER
 from utils.dda import Ray
 from utils.timer import Timer
-from utils import interpolate, bezier
+from utils import interpolate, bezier, Assets
+from utils.assest import MAIN_ROOT
 
 
 class Player(Entity, Sprite):
     def __init__(self, game):
+        assets = Assets()
         Entity.__init__(self, game, [100, 100], [10, 20])
-        Sprite.__init__(self, self, shaders = [Shader(frag_path="shaders/player/spalsh.glsl")])
+        Sprite.__init__(self, self,
+                        shaders = [Shader(frag_path=assets.shaders["player"]["splash.glsl"])],
+                        image = assets.images["entities"]["player.png"],
+                        )
+
 
         self._jump_buffer = False  # handle early jumps
         self.tile_size = self.game.tile_map.tile_size  # tile size of the current layer
@@ -63,6 +69,7 @@ class Player(Entity, Sprite):
         self.platform_points["bottom"] = self.platform_rays["bottom"].update(list(self.rect().center), 90)
         self.platform_points["bottom_right"] = self.platform_rays["bottom_right"].update(list(self.rect().center), 40)
 
+
         if self._jump_buffer and self.collison_types["bottom"]:
             self.jump()
             self._jump_buffer = False
@@ -71,6 +78,8 @@ class Player(Entity, Sprite):
         #   accelerate : 0.98,  0.116,  0.664,  0.411,
         #   max_speed : linear
         #   decelerate : 0.951,  0.829,  -0.104,  0.958,
+        if self.pos[1] > 710:
+            self.pos[1] = -310
 
 
 
