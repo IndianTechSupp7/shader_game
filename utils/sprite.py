@@ -1,6 +1,6 @@
 import pygame
 from utils.entity import Entity
-from utils.shader import Shader, Texture
+from utils.shader import Shader, Texture, ConstUniforms
 from utils.animation import Animation
 
 
@@ -17,10 +17,19 @@ class Sprite:
         for shader in self.shaders:
             shader.construct(self.surf)
 
+        self.const_uniforms = ConstUniforms(
+            time=0,
+        ).update_shaders(self.shaders)
+
+
 
 
 
     def render(self):
+        self.const_uniforms.time += 0.01
+
+
+        self.const_uniforms.update_shaders(self.shaders)
         if self.animation:
             self.surf = self.animation.render()
 
@@ -29,3 +38,7 @@ class Sprite:
             self.surf = shader.render()
 
         return self.surf
+
+
+
+

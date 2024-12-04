@@ -18,7 +18,6 @@ class Entity:
 
     def update(self, movement = [0, 0], layers = []):
         frame_movement = [self.vel[0] + movement[0] * self.speed, self.vel[1] + movement[1] * self.speed]
-        print(frame_movement[0])
         self.collison_types = {"left" : False, "right" : False, "top" : False, "bottom" : False}
 
 

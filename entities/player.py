@@ -49,7 +49,6 @@ class Player(Entity, Sprite):
     
     def update(self, movement = [0, 0], layers = [], dt=1):
         self._dx = next(interpolate(self._dx, movement[0], 0.06))
-        print(self._dx)
         if self._dx > 0:
             a = bezier(0.244,  0.327,  0.4,  1.038, self._dx)[1]
             #print(a ,self._dx)
