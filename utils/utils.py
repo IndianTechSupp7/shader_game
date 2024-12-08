@@ -17,6 +17,10 @@ def lerp(a, b, t):
     return a + (b-a)*t
 
 
+def clamp(a, b, x): # min, max, val
+    return max(min(b, x), a)
+
+
 def interpolate(x, y, step):
     """
     Gradually interpolates x towards y in steps.

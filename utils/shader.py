@@ -1,6 +1,6 @@
 import pygame
 from pygame_shaders_setup import Shader as BSahder
-from pygame_shaders_setup import Texture, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER
+from pygame_shaders_setup import Texture, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER, DefaultScreenShader
 import moderngl
 
 class Shader(BSahder):

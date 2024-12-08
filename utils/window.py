@@ -1,15 +1,35 @@
 import pygame
-from pygame_shaders_setup import DefaultScreenShader
+from utils.shader import DefaultScreenShader, Texture
+import win32gui
+import win32con
+
+
+def wndProc(oldWndProc, draw_callback, hWnd, message, wParam, lParam):
+    if message == win32con.WM_SIZE:
+        draw_callback()
+        win32gui.RedrawWindow(hWnd, None, None, win32con.RDW_INVALIDATE | win32con.RDW_ERASE)
+    return win32gui.CallWindowProc(oldWndProc, hWnd, message, wParam, lParam)
+
+
 
 
 class Window:
-    def __init__(self):
+    def __init__(self, size=(840, 720), maximize=False, resizable=False):
         pygame.init()
-        self.size = self.w, self.h = (840, 720)
-        self.screen = pygame.display.set_mode(self.size, pygame.OPENGL | pygame.DOUBLEBUF)
-        self.display = pygame.Surface((self.w/2, self.h/2))
+        self.screen = pygame.display.set_mode(size, pygame.OPENGL | pygame.DOUBLEBUF | pygame.RESIZABLE) #pygame.OPENGL | pygame.RESIZABLE | pygame.DOUBLEBUF
+        pygame.display.set_caption("MyWindow")
+        if maximize:
+            window_handle = Call_Window.find_window("MyWindow")  # replace MyWindow with actual name as captioned.
+            if window_handle:
+                Call_Window.maximize_window(window_handle)
+            else:
+                print("Window not found.")
+        self.size = self.w, self.h = self.screen.get_size()
+        self.display = pygame.Surface(self.size, pygame.SRCALPHA)
+        self.clock = pygame.time.Clock()
 
         self.screen_shader = DefaultScreenShader(self.display)
+
 
         self.clock = pygame.time.Clock()
         self.dt = 0
@@ -25,7 +45,8 @@ class Window:
             "scroll_down" : False,
         }
 
-
+        oldWndProc = win32gui.SetWindowLong(win32gui.GetForegroundWindow(), win32con.GWL_WNDPROC,
+                                            lambda *args: wndProc(oldWndProc, self.update, *args))
 
     def events(self, press = {}, release = {}):
         self.mouse["press"] = [False, False, False]
@@ -60,7 +81,6 @@ class Window:
                     self.mouse["scroll_down"] = True
                 if event.button == 5:
                     self.mouse["scroll_up"] = True
-
             if event.type == pygame.KEYDOWN:
                 for e in press:
                     if event.key == e:
@@ -69,20 +89,56 @@ class Window:
                 for e in release:
                     if event.key == e:
                         release[e]()
+            if event.type == pygame.VIDEORESIZE:
+                self.size = self.w, self.h = event.w, event.h
+                self.display = pygame.Surface(self.size, pygame.SRCALPHA)
+                self.screen_shader.set_target_texture(Texture(self.display, self.screen_shader.ctx))
+                self.screen_shader.set_target_surface(self.display)
+
+
         mx, my = pygame.mouse.get_pos()
         mx /= self.screen.width/self.display.width
         my /= self.screen.height/self.display.height
         self.mouse["pos"] = (mx, my)
         self.mouse["rel"] = pygame.mouse.get_rel()
 
-    def run(self):
-        self.dt = self.clock.tick(120)/1000
-        self.screen_shader.render()
-        pygame.display.flip()
+    @staticmethod
+    def update(func):
+        def wrapper(self):
+            #self.size = self.w, self.h = self.screen.get_size()
+            self.display = pygame.Surface(self.size, pygame.SRCALPHA)
+            self.display.fill((100, 0, 0))
+            func(self)
+            self.screen_shader.set_target_texture(Texture(self.display, self.screen_shader.ctx))
+            self.screen_shader.set_target_surface(self.display)
+            self.screen_shader.render()
+            pygame.display.flip()
+        return wrapper
 
-if __name__ == '__main__':
-    w = Window()
-    while True:
-        w.events()
-        w.display.fill((0, 0, 0))
-        w.run()
+
+    def run(self):
+        while True:
+            #self.events()
+            self.update()
+            self.dt = self.clock.tick(120)/1000
+
+
+class Call_Window():
+    def find_window(window_title):
+        # Use window title to get window's handle
+        window_handle = win32gui.FindWindow(None, window_title)
+        return window_handle
+
+    def maximize_window(window_handle):
+        # Get current status
+        window_placement = win32gui.GetWindowPlacement(window_handle)
+
+        # If minimized currently, restore it
+        if window_placement[1] == win32con.SW_SHOWMINIMIZED:
+            win32gui.ShowWindow(window_handle, win32con.SW_RESTORE)
+
+        # Maximize it
+        win32gui.ShowWindow(window_handle, win32con.SW_MAXIMIZE)
+
+
+

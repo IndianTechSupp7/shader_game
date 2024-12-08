@@ -7,6 +7,7 @@ from utils import Sprite, Assets, Shader
 from utils.assest import MAIN_ROOT
 
 OFFSETS = [(-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
+GRID_COLOR = (20, 20, 20)
 
 
 class TileMap:
@@ -49,12 +50,16 @@ class TileMap:
                 rects.append(pygame.Rect(tile_pos[0] * self.tile_size, tile_pos[1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
 
-    def _render_layer(self, layer, surf, offset = (0, 0)):
+    def _render_layer(self, layer, surf, offset = (0, 0), sh_grid = False):
         # self.sprite.update_renderer()
-        for x in range(math.ceil(self.game.size[0] / self.tile_size)):
-            for y in range(math.ceil(self.game.size[1] / self.tile_size)):
+        for x in range(int(offset[0]//self.tile_size), math.ceil((self.game.size[0] + offset[0]) / self.tile_size)):
+            for y in range(int(offset[1]//self.tile_size), math.ceil((self.game.size[1] + offset[1]) / self.tile_size)):
                 coord = f"{x};{y}"
                 # test purposes
+                if sh_grid:
+                    pygame.draw.rect(surf, GRID_COLOR, (
+                    (x * self.tile_size) - offset[0], (y * self.tile_size) - offset[1], self.tile_size,
+                    self.tile_size), 1)
                 if coord in self.tile_map[layer]["tiles"]:
                     pos = self.tile_map[layer]["tiles"][coord]["pos"]
                     # self.sprite.shaders[0].clear((0, 0, 0, 1))
@@ -68,9 +73,9 @@ class TileMap:
                     # pygame.draw.rect(surf, self.colors[coord], ((pos[0] * self.tile_size) - offset[0], (pos[1] * self.tile_size) - offset[1], self.tile_size, self.tile_size))
                     pygame.draw.rect(surf, (255, 255, 255), ((pos[0] * self.tile_size) - offset[0], (pos[1] * self.tile_size) - offset[1], self.tile_size, self.tile_size))
 
-    def render(self, surf, offset = (0, 0)):
+    def render(self, surf, offset = (0, 0), sh_grid = False):
         for layer in sorted(self.tile_map, key=lambda x: self.tile_map[x]["z"]):
-            self._render_layer(layer, surf, offset)
+            self._render_layer(layer, surf, offset, sh_grid=sh_grid)
 
 if __name__ == '__main__':
     tile_map = TileMap(None, "lvl1")
