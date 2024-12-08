@@ -9,8 +9,12 @@ class WidgetManager:
         self.app = app
         self.child = child
         self.surf = pygame.Surface(self.app.size, pygame.SRCALPHA)
+        self.size = self.app.size
+
+        self.widgets = {}
 
         self.construct_widgets()
+        print(self.widgets)
 
     def render(self, surf):
         surf.blit(self.surf, (0, 0))
@@ -18,15 +22,21 @@ class WidgetManager:
     def repr(self, f):
         return self._get_widgets(f)
 
+    def _init_widgets_wrapper(self, widget, parent, layer):
+        self.widgets[str(widget.id) + f"_{layer}"] = widget
+        widget.construct(self.app, parent)
+
     def construct_widgets(self):
-        self._get_widgets(lambda widget, parent: widget.construct(self.app, parent))
+        self._get_widgets(lambda widget, parent, layer: self._init_widgets_wrapper(widget, parent, layer))
 
     def update_widgets(self):
-        self.surf.fill((0, 0, 0, 0))
-        self._get_widgets(lambda widget, _: widget.update())
+        self.size = self.app.size
+        self.surf = pygame.Surface(self.size, pygame.SRCALPHA)
+        self._get_widgets(lambda widget, *_,: widget.update())
 
     def render_widgets(self):
-        self._get_widgets(lambda widget, _: widget.render())
+        for widget in sorted(self.widgets, key=lambda x: int(x.split("_")[-1]), reverse=True):
+            self.widgets[widget].render()
 
     def _get_childs(self, widget):
         if "childs" in vars(widget):
@@ -36,16 +46,16 @@ class WidgetManager:
         return []
 
     def _get_widgets(self, f):
-        parent = self
-        childs = [self.child]
+        childs = [(self.child, self)] # widget, parent
+        layer = 0
         while childs != []:
+            layer+=1
             chs = childs.copy()
             childs = []
-            for child in chs:
-                f(child, parent)
-                parent = child
+            for child, parent in chs:
+                f(child, parent, layer)
                 for ch in self._get_childs(child):
-                    childs.append(ch)
+                    childs.append((ch, child))
 
 
 if __name__ == '__main__':
