@@ -7,11 +7,15 @@ class Row(Widget):
 
         self._expanded = []
         self.expand_y = kwargs.get("expand_y") or False # expand the widgets along the yaxis based on self.pos[1]
+        self.expand = kwargs.get("expand") or False # expand the widgets along the yaxis based on self.pos[1]
 
 
     def construct(self, app, parent):
         super().construct(app, parent)
-        self.set_size([self._get_width(self.childs, len(self.childs)), self._get_max("h")])
+        if self.expand:
+            self.set_size(self.parent.size)
+        else:
+            self.set_size([self._get_width(self.childs, len(self.childs)), self._get_max("h")])
         self.surf = pygame.Surface(self.size, pygame.SRCALPHA)
 
     def _get_width(self, childs, k = None): # get the widgets whole width (sums up)
@@ -32,7 +36,10 @@ class Row(Widget):
 
     def update(self):
         super().update()
-        self.set_size(self.parent.size)
+        if self.expand:
+            self.set_size(self.parent.size)
+        else:
+            self.set_size([self._get_width(self.childs, len(self.childs)), self._get_max("h")])
         self._expanded = [i for i in self.childs if i.expanded]
         if self._expanded:
             self._not_expaned = [i for i in self.childs if not i.expanded]

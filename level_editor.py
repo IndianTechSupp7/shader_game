@@ -15,6 +15,7 @@ class App(Window):
             child=Row(
                 color=(0, 0, 100),
                 expand_y=True,
+                expand=True,
                 childs=[
                     Widget(
                         size=(300, 100),
