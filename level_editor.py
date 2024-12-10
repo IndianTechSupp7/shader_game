@@ -2,7 +2,8 @@ import pygame
 from utils import Window
 from level.tile_map import TileMap
 from tile_editor.grid import Grid
-from tile_editor import WidgetManager, Widget, Row
+from tile_editor import WidgetManager, Widget, Row, Btn, Padding, Column
+from tile_editor.tile_editor_elements import NavBar
 
 
 class App(Window):
@@ -13,21 +14,13 @@ class App(Window):
         self.manager = WidgetManager(
             app=self,
             child=Row(
-                color=(0, 0, 100),
-                expand_y=True,
-                expand=True,
                 childs=[
+                    NavBar(),
                     Widget(
-                        size=(300, 100),
-                        color=(100, 0, 0),
-                    ),
-                    Widget(
-                        size=(100, 150),
-                        color=(0, 100, 0),
-                        expanded=True,
-                    ),
-
+                        color = (0, 100, 100)
+                    )
                 ]
+
             )
         )
 
@@ -37,6 +30,7 @@ class App(Window):
         self.display.fill((0, 0, 0))
         self.manager.update_widgets()
         self.manager.render_widgets()
+
 
         self.manager.render(self.display)
 

@@ -1,6 +1,5 @@
 import pygame
-from utils import generate_dict_tree
-from tile_editor.widget import Widget
+from tile_editor.gui.widget import Widget
 from tile_editor.row import Row
 
 
@@ -9,12 +8,11 @@ class WidgetManager:
         self.app = app
         self.child = child
         self.surf = pygame.Surface(self.app.size, pygame.SRCALPHA)
-        self.size = self.app.size
+        self.size = self.w, self.h = self.app.size
 
         self.widgets = {}
 
         self.construct_widgets()
-        print(self.widgets)
 
     def render(self, surf):
         surf.blit(self.surf, (0, 0))
@@ -23,14 +21,15 @@ class WidgetManager:
         return self._get_widgets(f)
 
     def _init_widgets_wrapper(self, widget, parent, layer):
+        print(widget)
         self.widgets[str(widget.id) + f"_{layer}"] = widget
-        widget.construct(self.app, parent)
+        widget.construct_widget(self.app, parent)
 
     def construct_widgets(self):
         self._get_widgets(lambda widget, parent, layer: self._init_widgets_wrapper(widget, parent, layer))
 
     def update_widgets(self):
-        self.size = self.app.size
+        self.size = self.w, self.h = self.app.size
         self.surf = pygame.Surface(self.size, pygame.SRCALPHA)
         self._get_widgets(lambda widget, *_,: widget.update())
 
@@ -39,6 +38,8 @@ class WidgetManager:
             self.widgets[widget].render()
 
     def _get_childs(self, widget):
+        # if "build" in dir(widget):
+        #     return [widget.build()]
         if "childs" in vars(widget):
             if widget.childs: return widget.childs
         if "child" in vars(widget):

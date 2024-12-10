@@ -20,7 +20,7 @@ class Sprite:
             pygame.transform.scale(self.image, self.surf.size, self.surf)
 
         for shader in self.shaders:
-            shader.construct(self.surf)
+            shader.construct_widget(self.surf, )
 
         self.const_uniforms = ConstUniforms(
             time=0,
