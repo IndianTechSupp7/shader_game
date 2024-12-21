@@ -1,24 +1,38 @@
 import pygame.key
 
-from utils import Window
+from utils import TimerManager, Timer
+from utils.game_window import Window
 from level import TileMap
 from entities import Player
 
 class Game(Window):
     def __init__(self):
-        super().__init__()
+        super().__init__(display_scale=.5)
 
-        self.tile_map = TileMap(self, "")
+        self.timer_manager = TimerManager(self)
+        Timer.TIMER_MANAGER = self.timer_manager
+
+        self.tile_map = TileMap(self, "test_level")
         self.player = Player(self)
 
         self.offset = [0, 0]
         self.camera_target = self.player
 
+
     def run(self):
         while True:
-            self.events(press={
-                pygame.K_w : lambda : self.player.jump()
-            })
+            self.dt = self.clock.tick(120) / 1000
+            self.display.fill((100, 0, 0))
+
+            self.events(
+                press={
+                    pygame.K_w : lambda : self.player.jump()
+                },
+                release={
+                    pygame.K_w : lambda : self.player.release_jump()
+                }
+            )
+
             self.display.fill((0, 0, 0))
 
             self.offset[0] += ((self.camera_target.pos[0] - self.display.width/2) - self.offset[0])/20
@@ -33,11 +47,11 @@ class Game(Window):
             self.tile_map.render(self.display, offset)
             self.player.render(self.display, offset)
 
-            #pygame.draw.rect(self.display, (255, 255, 255), pygame.Rect(100, 100, 10, 10).inflate(10, 10))
 
-            #self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
+            self.timer_manager.update(self.dt)
+            self.screen_shader.render()
+            pygame.display.flip()
 
-            super().run()
 
 if __name__ == '__main__':
     Game().run()

@@ -9,6 +9,8 @@ class Column(Widget):
         self.childs = childs
 
         self._expanded = []
+        self._last_size = None
+
 
     def _expand_check(self):
         if self.expand_w:
@@ -24,13 +26,6 @@ class Column(Widget):
         super().construct_widget(app, parent)
         self._expand_check()
         #self.surf = pygame.Surface(self.size, pygame.SRCALPHA)
-
-    def _get_size_bef_init(self, childs):
-        height = sum([i.h for i in childs])
-        width = max([i.w for i in childs])
-        if width and height:return width, height
-        elif width: return width, self.parent.h
-        elif height: return self.parent.w, height
 
 
     def _get_height(self, childs, k = None): # get the widgets whole width (sums up)
@@ -51,19 +46,34 @@ class Column(Widget):
 
     def update(self):
         super().update()
-        self._expand_check()
+        if self._last_size != self.size:
+            self._last_size = self.size
+            self._expanded = [i for i in self.childs if i.expand_h]
+            if self._expanded:
+                self.expand_h = True
+                #self.set_width(self.parent.w)
+                self.set_height(self.parent.h)
+                self._not_expaned = [i for i in self.childs if not i.expand_h]
+                for ratio, child in zip(self._get_height_ratio(self._expanded), self._expanded):
+                    child.set_size((self.w if child.expand_w else child.w, (self.h - self._get_height(self._not_expaned)) * ratio))
+            else:
+                self.expand_h = False
+                #self.set_width(self._get_max("w"))
+                self.set_height(self._get_height(self.childs))
 
-        self._expanded = [i for i in self.childs if i.expand_h]
-        if self._expanded:
-            self._not_expaned = [i for i in self.childs if not i.expand_h]
-            for ratio, child in zip(self._get_height_ratio(self._expanded), self._expanded):
-                child.set_size((self.w if child.expand_w else child.w, (self.h - self._get_height(self._not_expaned)) * ratio))
+            if not [i for i in self.childs if i.expand_w]:
+                self.expand_w = False
+                self.set_width(self._get_max("w"))
+            else:
+                self.expand_w = True
+                self.set_width(self.parent.w)
 
-        for i, child in enumerate(self.childs):
-            y = self._get_height(self.childs, i)
-            x = 0
-            child.set_pos((x, y))
-            child.set_size((self.w if child.expand_w else child.w, child.h))
+
+            for i, child in enumerate(self.childs):
+                y = self._get_height(self.childs, i)
+                x = 0
+                child.set_pos((x, y))
+                #child.set_size((self.w if child.expand_w else child.w, child.h))
 
     def render(self):
         super().render()

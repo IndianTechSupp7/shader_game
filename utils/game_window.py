@@ -1,29 +1,15 @@
 import pygame
 from utils.shader import DefaultScreenShader, Texture
-import win32gui
-import win32con
 
-
-def wndProc(oldWndProc, draw_callback, hWnd, message, wParam, lParam):
-    if message == win32con.WM_SIZE:
-        draw_callback()
-        win32gui.RedrawWindow(hWnd, None, None, win32con.RDW_INVALIDATE | win32con.RDW_ERASE)
-    return win32gui.CallWindowProc(oldWndProc, hWnd, message, wParam, lParam)
 
 
 
 
 class Window:
-    def __init__(self, size=(840, 720), maximize=False, resizable=False, display_scale=1):
+    def __init__(self, size=(840, 720), display_scale=1):
         pygame.init()
-        self.screen = pygame.display.set_mode(size, pygame.OPENGL | pygame.DOUBLEBUF | pygame.RESIZABLE) #pygame.OPENGL | pygame.RESIZABLE | pygame.DOUBLEBUF
+        self.screen = pygame.display.set_mode(size, pygame.OPENGL | pygame.DOUBLEBUF)
         pygame.display.set_caption("MyWindow")
-        if maximize:
-            window_handle = Call_Window.find_window("MyWindow")  # replace MyWindow with actual name as captioned.
-            if window_handle:
-                Call_Window.maximize_window(window_handle)
-            else:
-                print("Window not found.")
         self.size = self.w, self.h = self.screen.get_size()
         self.display_scale = display_scale
         self.display = pygame.Surface((self.w*self.display_scale, self.h*self.display_scale), pygame.SRCALPHA)
@@ -41,14 +27,12 @@ class Window:
             "press" : [False, False, False],
             "release" : [False, False, False],
             "hold" : [False, False, False],
-            "pos" : (0, 0),
-            "rel" : (0, 0),
+            "pos" : (0., 0.),
+            "rel" : (0., 0.),
             "scroll_up" : False,
             "scroll_down" : False,
         }
 
-        oldWndProc = win32gui.SetWindowLong(win32gui.GetForegroundWindow(), win32con.GWL_WNDPROC,
-                                            lambda *args: wndProc(oldWndProc, self.update, *args))
 
     def events(self, press = {}, release = {}):
         self.mouse["press"] = [False, False, False]
@@ -91,51 +75,21 @@ class Window:
                 for e in release:
                     if event.key == e:
                         release[e]()
-            if event.type == pygame.VIDEORESIZE:
-                self.size = self.w, self.h = event.w, event.h
-                self.display = pygame.Surface((self.w*self.display_scale, self.h*self.display_scale), pygame.SRCALPHA)
-                self.display_texture.update(self.display)
-                self.screen_shader.set_target_texture(self.display_texture)
 
         mx, my = pygame.mouse.get_pos()
         self.mouse["pos"] = (mx / self.display_scale, my / self.display_scale)
         self.mouse["rel"] = pygame.mouse.get_rel()
 
-    @staticmethod
-    def update(func):
-        def wrapper(self):
-            #self.size = self.w, self.h = self.screen.get_size()
-            #self.display = pygame.Surface((self.w*self.display_scale, self.h*self.display_scale), pygame.SRCALPHA)
-            self.display.fill((100, 0, 0))
-            func(self)
-            self.screen_shader.render()
-            pygame.display.flip()
-        return wrapper
 
 
     def run(self):
         while True:
-            #self.events()
-            self.update()
+            self.events()
             self.dt = self.clock.tick(120)/1000
+            self.display.fill((100, 0, 0))
 
-
-class Call_Window():
-    def find_window(window_title):
-        # Use window title to get window's handle
-        window_handle = win32gui.FindWindow(None, window_title)
-        return window_handle
-
-    def maximize_window(window_handle):
-        # Get current status
-        window_placement = win32gui.GetWindowPlacement(window_handle)
-
-        # If minimized currently, restore it
-        if window_placement[1] == win32con.SW_SHOWMINIMIZED:
-            win32gui.ShowWindow(window_handle, win32con.SW_RESTORE)
-
-        # Maximize it
-        win32gui.ShowWindow(window_handle, win32con.SW_MAXIMIZE)
+            self.screen_shader.render()
+            pygame.display.flip()
 
 
 

@@ -9,6 +9,7 @@ class WidgetManager:
         self.child = child
         self.surf = pygame.Surface(self.app.size, pygame.SRCALPHA)
         self.size = self.w, self.h = self.app.size
+        self._last_size = self.size
 
         self.widgets = {}
 
@@ -31,11 +32,19 @@ class WidgetManager:
     def update_widgets(self):
         self.size = self.w, self.h = self.app.size
         self.surf = pygame.Surface(self.size, pygame.SRCALPHA)
+        if self._last_size != self.size:
+            self.handle_widget_events()
+            self._last_size = self.size
         self._get_widgets(lambda widget, *_,: widget.update())
 
     def render_widgets(self):
         for widget in sorted(self.widgets, key=lambda x: int(x.split("_")[-1]), reverse=True):
             self.widgets[widget].render()
+
+    def handle_widget_events(self):
+        for widget in sorted(self.widgets, key=lambda x: int(x.split("_")[-1]), reverse=True):
+            for event in self.widgets[widget].events:
+                event()
 
     def _get_childs(self, widget):
         # if "build" in dir(widget):

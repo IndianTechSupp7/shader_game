@@ -52,6 +52,7 @@ class Padding(Widget):
         else:
             #self.set_height(self.child.h + self._bottom)
             self.child.set_height(self.h - (self._top + self._bottom))
+            #print(self.child.h)
 
 
     def _center(self):
@@ -82,7 +83,7 @@ class Padding(Widget):
             self.child.set_width(self.w - (self._right + self._left))
 
     def update(self):
-        #super().update()
+        super().update()
         self.child.set_pos((self._left, self._top))
         if self._centered:
             self._center()

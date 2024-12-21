@@ -10,6 +10,10 @@ class Widget:
         self._pos = self._x, self._y = (0, 0)
         self._size = self._w, self._h = (1, 1)
 
+        self.events = [
+            self.resize_event
+        ]
+
 
     def clear(self):
         self.surf.fill(self.color)
@@ -66,6 +70,9 @@ class Widget:
         self.set_height((self.args.get("height") or self.args.get("h")) or self.parent.h)
         self.get_expand()
 
+        self.target_width = self.args.get("target_width") or self.parent.w
+        self.target_height = self.args.get("target_height") or self.parent.h
+
         self.surf = pygame.Surface(self.size, pygame.SRCALPHA)
 
 
@@ -79,16 +86,18 @@ class Widget:
         self.expand_h = not (self.args.get("height") or self.args.get("h"))
         return self.expand_w, self.expand_h
 
+    def resize_event(self):
+        if self.expand_w:
+            self.set_width(self.parent.w)
+        if self.expand_h:
+            self.set_height(self.parent.h)
+
 
     def update(self):
-        if not getattr(self.parent, "RESIZE", False) and self.expand_w:
-            self.set_width(self.parent.w)
-        if not getattr(self.parent, "RESIZE", False) and self.expand_h:
-            self.set_height(self.parent.h)
         self.clear()
 
 
     def render(self):
-        self.parent.surf.blit(self.surf, self.pos)
+        self.parent.surf.blit(self.surf, (round(self.pos[0]), round(self.pos[1])))
 
 

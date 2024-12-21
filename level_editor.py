@@ -15,13 +15,33 @@ class App(Window):
             app=self,
             child=Row(
                 childs=[
-                    NavBar(),
-                    Widget(
-                        color = (0, 100, 100)
-                    )
+                    Column(
+                        childs=[
+                        Row(
+                            childs=[
+                                Widget(color=(0, 100, 0), height=30)
+                                for _ in range(10)
+                            ]
+                        ),
+                        Widget(color=(0, 100, 100))
+                    ]),
+
                 ]
 
             )
+            # child=Row(
+            #     childs=[
+            #         Widget(color=(100, 100, 0)),
+            #         Row(childs=[
+            #             Padding(
+            #                 padding=Padding.symetric(horizontal=10, vertical=10),
+            #                 child=Widget(color=(100, 0, 0), height=30),
+            #             ) for _ in range(10)
+            #         ])
+            #     ]
+            # )
+
+
         )
 
     @Window.update
@@ -31,8 +51,10 @@ class App(Window):
         self.manager.update_widgets()
         self.manager.render_widgets()
 
+        #print(self.clock.get_fps())
 
         self.manager.render(self.display)
+        pygame.draw.circle(self.display, (255, 255 ,255), self.mouse["pos"], 10)
 
 
 if __name__ == '__main__':
